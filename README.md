@@ -12,3 +12,5 @@ Make sure that XQuartz is configured to allow network connections.
 ## Known Issues
 
 Performance is _really_ slow.  Make sure you have a snappy system.
+
+No ROM's installed by default in image.  Looking for an option to mount host folders to the right place.
