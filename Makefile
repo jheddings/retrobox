@@ -36,7 +36,7 @@ release: build
 run: build
 	DISPLAY=:0 /usr/X11/bin/xhost + 127.0.0.1
 	docker container run --rm --interactive --tty --privileged \
-		--volume "$(BASEDIR)/content:/opt/retropie/content" \
+		--volume "$(BASEDIR)/system:/home/player1/RetroPie" \
 		$(APPNAME):dev
 
 ################################################################################

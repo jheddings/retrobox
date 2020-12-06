@@ -1,29 +1,52 @@
 FROM debian:buster
 
+# this is the common root directory referenced by RetroPie
+WORKDIR /opt/retropie
+
 # update system packages
 RUN apt-get update && apt-get upgrade --assume-yes
 
-# install RetroPie dependencies (and some helpful tools)
-RUN apt-get install --assume-yes curl git vim tree dialog unzip
+# install RetroPie setup dependencies and some helpful tools for the container.
+# note that we don't install _every_ dependency here, since the setup script will
+# handle the rest...  these are mostly required for setup to run properly and/or
+# save a little time in future steps.
 
-# cleanup after apt-get
+RUN apt-get install --assume-yes \
+  git vim tree dialog unzip sudo curl wget systemd \
+  lsb-release build-essential xmlstarlet python3-pyudev \
+  libudev-dev libavcodec-dev libavformat-dev libavdevice-dev
+
+# we will install RetroPie packages using RetroPie-Setup
+RUN git clone --depth=1 https://github.com/RetroPie/RetroPie-Setup.git
+WORKDIR /opt/retropie/RetroPie-Setup
+COPY etc/setup_datadir.patch .
+RUN patch -p1 < setup_datadir.patch
+
+# setup retropie user here so we can do the setup using sudo...
+RUN useradd -d /home/player1 -G sudo -m player1
+RUN usermod -aG adm,dialout,cdrom,audio,video,plugdev,games,users player1
+COPY etc/sudo_player1 /etc/sudoers.d/player1
+
+# RetroPie needs to be installed using sudo by target user
+# XXX is there a cleaner way to do this w/out switching back and forth btwn player1 & root?
+USER player1
+RUN sudo bash retropie_packages.sh setup basic_install
+
+# finish system setup as root...
+USER root
+
+# these can be helpful tools for troubleshooting - installed
+# after retropie to avoid recompiling if we change things...
+#RUN apt-get install --assume-yes sudo x11-apps glxgears
+
+# cleanup after apt-get operations
 RUN apt-get autoremove --assume-yes && apt-get clean
 
-WORKDIR /opt/retropie
-
-# install RetroPie packages
-RUN git clone --depth=1 https://github.com/RetroPie/RetroPie-Setup.git
-RUN cd RetroPie-Setup && bash retropie_packages.sh setup basic_install
-
-# setup retropie user
-RUN useradd -d /home/player1 -m player1
-RUN usermod -aG adm,dialout,cdrom,audio,video,plugdev,games,users player1
-
-#RUN apt-get install --assume-yes mesa-utils libgl1-mesa-glx
-#RUN apt-get install --assume-yes x11-apps xserver-xorg-video-intel
-
+# set up the user content folder
 USER player1
 WORKDIR /home/player1
+#RUN mkdir RetroPie
+#RUN ln -s RetroPie/es .emulationstation
 
 # setup emulator environment
 ENV DISPLAY=host.docker.internal:0
@@ -32,4 +55,3 @@ ENV XDG_RUNTIME_DIR=/tmp
 #ENTRYPOINT /usr/bin/emulationstation
 ENTRYPOINT /bin/bash
 
-#CMD su - player1 -c "export HOME=/home/player1;export DISPLAY=:0;/usr/bin/emulationstation"

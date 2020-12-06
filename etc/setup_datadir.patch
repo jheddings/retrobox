@@ -1,0 +1,19 @@
+This patch changes the default location for storing emulators and config data so
+that we can map it easilly to a user-mapped content folder.
+
+--- a/retropie_packages.sh
++++ b/retropie_packages.sh
+@@ -30,10 +30,10 @@
+ 
+ home="$(eval echo ~$user)"
+ datadir="$home/RetroPie"
+-biosdir="$datadir/BIOS"
++biosdir="$rootdir/BIOS"
+ romdir="$datadir/roms"
+ emudir="$rootdir/emulators"
+-configdir="$rootdir/configs"
++configdir="$datadir/configs"
+ 
+ scriptdir="$(dirname "$0")"
+ scriptdir="$(cd "$scriptdir" && pwd)"
+
