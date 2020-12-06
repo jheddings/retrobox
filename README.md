@@ -23,7 +23,7 @@ Perform the Basic Install.
 You'll need XQuartz to run this on macOS.  Specifically, version 2.7.8 has been tested.
 Other versions of XQuartz may work, but some have known issues with OpenGL.
 
-Make sure that XQuartz is configured to allow network connections.
+Make sure that your X server is configured to allow network connections from localhost.
 
 ## Known Issues
 
