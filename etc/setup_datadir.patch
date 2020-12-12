@@ -1,6 +1,8 @@
 This patch changes the default location for storing emulators and config data so
 that we can map it easilly to a user-mapped content folder.
 
+Note that this does not work if packages are installed from binaries.
+
 --- a/retropie_packages.sh
 +++ b/retropie_packages.sh
 @@ -30,10 +30,10 @@
