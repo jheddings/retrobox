@@ -1,4 +1,4 @@
-FROM debian:buster
+FROM debian:bullseye
 
 # this is the common root directory referenced by RetroPie
 WORKDIR /opt/retropie
